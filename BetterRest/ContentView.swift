@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var wakup = defaultWakeTime
     @State private var sleepAmount = 8.0
+    
     @State private var coffeAmount = 1
     
     @State private var alertTitle = ""
@@ -28,16 +29,18 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
+            
+            
             Form {
+                
+                
                 Section("When do you want to wake up?") {
                     HStack{
                         
                         DatePicker("Time:", selection: $wakup, displayedComponents: .hourAndMinute)
                         
                     }
-                    
                 }
-                
                 
                 
                 Section("Desired aount of sleep"){
@@ -45,8 +48,14 @@ struct ContentView: View {
                 }
                 
                 Section("Daily coffe intake"){
-                    Stepper("^[\(coffeAmount) cup](inflect: true)", value: $coffeAmount, in: 1...29) // This is a way to add plurals if is needed like here "1 cup" "2 cups"
-                    
+                    Stepper("^[\(coffeAmount) cup](inflect: true)", value: $coffeAmount, in: 1...10) // This is a way to add plurals if is needed like here "1 cup" "2 cups"
+                }
+                
+                // Conditionally render the Text view only if alertMessage is not empty
+                if let bedtimeMessage = bedtimeText {
+                    bedtimeMessage
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .listRowBackground(Color.clear)
                 }
                 
                 Button("Calculate", role: .none, action: calculateBedtime )
@@ -79,7 +88,7 @@ struct ContentView: View {
             
             let sleepTime = wakup - prediction.actualSleep
             
-            alertTitle = "Your ideal Bed Time os:"
+            alertTitle = "Your ideal Bed Time is:"
             alertMessage = sleepTime.formatted(date: .omitted, time: .shortened)
         }catch {
             alertTitle = "Error"
@@ -88,7 +97,15 @@ struct ContentView: View {
         }
         showingAlert = true
     }
+    
+    // Computed property for bedtime message
+    private var bedtimeText: Text? {
+        guard !alertMessage.isEmpty else { return nil }
+        return Text("Bed time: ").bold() + Text(alertMessage)
+    }
 }
+
+
 
 #Preview {
     ContentView()
